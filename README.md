@@ -1,4 +1,4 @@
-<h1> e-commerce API server< /h1>
+<h1> e-commerce API server</h1>
 
 <h2>overview</h2>
 <p>this is a simple e-commerce API server developed using Django</p>
