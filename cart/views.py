@@ -10,7 +10,7 @@ from rest_framework.decorators import parser_classes
 
 
 from cart.models import CartItem
-from cart.serializers import CartItemSerializer
+from cart.serializers import CartItemSerializer, CartSerializer
 from product.models import Product
 
 # Create your views here.
@@ -19,8 +19,8 @@ from product.models import Product
 @api_view(['GET'])
 # @parser_classes([JSONParser])
 def get_all_cart_items(request: HttpRequest):
-    items = CartItem.objects.filter(profile=request.user.profile)
-    data = CartItemSerializer(items, many=True).data
+    cart = request.user.profile.cart
+    data = CartSerializer(cart).data
     return Response(data)
 
 
@@ -34,20 +34,17 @@ def add_to_cart(request: HttpRequest):
     profile = request.user.profile
 
     old_cart_item: CartItem = CartItem.objects.filter(
-        profile=profile, product=product).first()
+        cart=profile.cart, product=product).first()
 
-    new_cart_item = None
 
     if old_cart_item:
         old_cart_item.quantity = quantity
         old_cart_item.save()  
-        new_cart_item = old_cart_item
-        if quantity == 0:
-            old_cart_item.delete()
+
 
     elif quantity != 0:
-        new_cart_item = CartItem.objects.create(
-            profile=profile,
+        CartItem.objects.create(
+            cart=profile.cart,
             product=product,
             quantity=quantity,
         )
@@ -55,7 +52,7 @@ def add_to_cart(request: HttpRequest):
     else:
         return Response({'detail': 'cant add to cart with 0 quantity'}, status=status.HTTP_400_BAD_REQUEST)
 
-    s = CartItemSerializer(new_cart_item)
+    s = CartSerializer(profile.cart)
     return Response(s.data)
 
 
@@ -68,7 +65,7 @@ def delete_from_cart(request: HttpRequest):
     profile = request.user.profile
 
     old_cart_item: CartItem = CartItem.objects.filter(
-        profile=profile, product=product).first()
+        cart=profile.cart, product=product).first()
 
     if old_cart_item:
         old_cart_item.delete()
@@ -86,24 +83,22 @@ def increment_cart(request: HttpRequest):
     profile = request.user.profile
 
 
-    new_cart_item = None
     old_cart_item: CartItem = CartItem.objects.filter(
-        profile=profile, product=product).first()
+        cart=profile.cart, product=product).first()
 
     if old_cart_item:
         old_cart_item.quantity += 1
         old_cart_item.save()  
-        new_cart_item = old_cart_item
 
 
     else:
         new_cart_item = CartItem.objects.create(
-            profile=profile,
+            cart=profile.cart,
             product=product,
             quantity=1,
         )
 
-    s = CartItemSerializer(new_cart_item)
+    s = CartSerializer(profile.cart)
     return Response(s.data)
 
 @api_view(['POST'])
@@ -115,17 +110,13 @@ def decrement_cart(request: HttpRequest):
     profile = request.user.profile
 
 
-    new_cart_item = None
     old_cart_item: CartItem = CartItem.objects.filter(
-        profile=profile, product=product).first()
+        cart=profile.cart, product=product).first()
 
     if old_cart_item:
         old_cart_item.quantity -= 1
         old_cart_item.save()  
-        new_cart_item = old_cart_item
-        if old_cart_item.quantity == 0:
-            old_cart_item.delete()
 
 
-    s = CartItemSerializer(new_cart_item)
+    s = CartSerializer(profile.cart)
     return Response(s.data)

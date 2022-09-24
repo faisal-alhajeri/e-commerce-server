@@ -44,6 +44,8 @@ INSTALLED_APPS = [
     'util.apps.UtilConfig',
     'cart.apps.CartConfig',
     'user_profile.apps.UserProfileConfig',
+    'order.apps.OrderConfig',
+
 
     'versatileimagefield',
     'rest_framework',
@@ -62,7 +64,7 @@ MIDDLEWARE = [
     'django.middleware.clickjacking.XFrameOptionsMiddleware',
 ]
 
-ROOT_URLCONF = 'hand_crafts_server.urls'
+ROOT_URLCONF = 'settings.urls'
 
 TEMPLATES = [
     {
@@ -80,7 +82,7 @@ TEMPLATES = [
     },
 ]
 
-WSGI_APPLICATION = 'hand_crafts_server.wsgi.application'
+WSGI_APPLICATION = 'settings.wsgi.application'
 
 
 # Database

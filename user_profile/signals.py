@@ -1,8 +1,9 @@
-import profile
 from .models import UserProfile
 from django.db.models.signals import post_save, post_delete
 from django.dispatch import receiver
 from django.contrib.auth import get_user_model
+from cart.models import Cart
+
 User = get_user_model()
 
 
@@ -13,5 +14,17 @@ def deleteProfile(instance, **kwargs):
 
 
 @receiver(post_save, sender=User)
-def createProfile(instance, **kwargs):
-    UserProfile.objects.create(user=instance)
+def createProfile(instance, created, **kwargs):
+    if created:
+        UserProfile.objects.create(user=instance)
+
+@receiver(post_delete, sender=Cart)
+def cartCreate(instance, **kwargs):
+    instance.profile.delete()
+
+
+
+@receiver(post_save, sender=UserProfile)
+def createCart(instance,  created, **kwargs):
+    if created:
+        Cart.objects.create(profile=instance)
