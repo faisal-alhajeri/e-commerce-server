@@ -5,8 +5,8 @@ from rest_framework.permissions import IsAuthenticated
 from rest_framework.response import Response
 from rest_framework import status
 
-from product.models import Product
-from product.serializers import ProductSerializer
+from product.models import Product, ProductCategory
+from product.serializers import ProductCategorySerializer, ProductSerializer
 
 # Create your views here.
 @api_view(['GET'])
@@ -16,8 +16,7 @@ def all_products_view(request: HTTPResponse):
     return Response(s.data)
 
 @api_view(['GET'])
-@permission_classes([IsAuthenticated])
-def all_products_login_view(request: HTTPResponse):
-    products = Product.objects.all()
-    s = ProductSerializer(products, many=True)
+def all_products_categories(request: HTTPResponse):
+    categories = ProductCategory.objects.all()
+    s = ProductCategorySerializer(categories, many=True)
     return Response(s.data)
