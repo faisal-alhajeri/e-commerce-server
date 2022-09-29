@@ -9,7 +9,7 @@ class ProductCategory(BaseModel):
 
 
     def __str__(self) -> str:
-        return f'category - {self.name}'
+        return f'category - {self.name} - {self.uuid}'
 
 
 class Product(BaseModel): 
@@ -18,15 +18,20 @@ class Product(BaseModel):
     price = models.DecimalField('Product Price', max_digits=4, decimal_places=1)
     categories = models.ManyToManyField(ProductCategory, related_name='products', null=True, blank=True)
 
-    def get_images_urls(self):
+    def get_main_image_url(self):
         images = self.images.all()
         if images:
-            return [imgObj.img.url for imgObj in images]
+            return images.first().img.url
         else:
-            return ['static/images/default.png']
+            return 'static/images/default.png'
+
 
     def __str__(self) -> str:
         return f'{self.name} - {self.uuid}'
+
+    def add_images(self, files):
+        for image_name in files: 
+            self.images.create(img=files[image_name])
 
 class ProductImage(BaseModel): 
     product = models.ForeignKey(Product, related_name='images', on_delete=models.CASCADE)
