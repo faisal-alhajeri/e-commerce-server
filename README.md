@@ -22,6 +22,6 @@ access the Django administration page using path <code>/admin</code>
 </p>
 
 <p>
-admins will have a managment interface ro manage products 
+admins will have a managment interface to manage products 
 </p>
 
